@@ -1,4 +1,4 @@
-const linkFinder  = require('./LinkFinderInCategory')
+const linkFinder = require('./LinkFinderInCategory')
 const fs = require('fs');
 const LFIC = require('./LinkFinderInCategory')
 var HTMLParser = require('node-html-parser');
@@ -33,7 +33,7 @@ var options = {
 
 //  links.splice(0,10).map(async(i) =>{
 //      console.log(i.link);
-     
+
 //     const res = await PIFL.getProductInfos("https://www.hepsiburada.com" + i.link)
 //      console.log(res)
 //      fs.appendFileSync('ProductPrices.html' , JSON.stringify(res))
@@ -52,22 +52,56 @@ var options = {
 // })
 
 
-// const express = require('express');
-// const mongoose = require('mongoose');
+const express = require('express');
+const mongoose = require('mongoose');
 
-// const app = express();
+const app = express();
+
+app.use(express.json());
+app.use(express.urlencoded());
+
+app.get('/', (req, res) => {
+    res.send('Bismihi')
+})
 
 
 
-// // Connect to MongoDB
-// mongoose
-//   .connect(
-//     'mongodb://mongo:27017/docker-node-mongo',
-//     { useNewUrlParser: true }
-//   )
-//   .then(() => console.log('MongoDB Connected'))
-//   .catch(err => console.log(err));
+// Connect to MongoDB
+mongoose
+    .connect(
+        'mongodb://mongo:27017/docker-node-mongo',
+        { useNewUrlParser: true }
+    )
+    .then(() => console.log('MongoDB Connected'))
+    .catch(err => console.log(err));
 
-// const port = 3000;
+const Product = require('./models/Product');
 
-// app.listen(port, () => console.log('Server running...'));
+app.get('/', (req, res) => {
+    Product.find()
+        .then(items => res.render('index', { items }))
+        .catch(err => res.status(404).json({ msg: 'No items found' }));
+});
+
+app.post('/product/add', (req, res) => {
+    const newItem = new Item({
+      name: req.body.name
+    });
+
+    console.log(req.body);
+  
+    newItem.save().then(item => res.redirect('/product'));
+  });
+
+  app.get('/product', async(req, res) => {
+    
+    Product.find().then((item) =>{
+        console.log(item);
+    })
+  });
+
+
+
+const port = 3000;
+
+app.listen(port, () => console.log('Server running...'));
