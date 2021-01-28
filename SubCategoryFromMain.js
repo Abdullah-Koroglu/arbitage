@@ -34,19 +34,20 @@ getCategories = () => {
                     linksInSub.push(linkOfA)
                 });
                 if (linksInSub.length !== 0)
-                    links.push({ 'CategoryName': baslik, 'linksInSub': linksInSub })
+                    links.push({ CategoryName: baslik, linksInSub: linksInSub })
                 linksInSub = []
             });
-            console.log(links);
-            fs.writeFileSync('gezer.html', JSON.stringify({ "Links": links, 'Date': Date.now() }))
+            // console.log(links);
+            fs.writeFileSync('gezer.html', JSON.stringify({ Links: links, Date: Date.now() }))
         }else{
             console.log(response.statusCode + ' kategoriler alınamadı');
         }
     });
 }
 
+getCategories()
 module.exports = {
-    getCategories()
+    getCategories
 }
 
         // const yalancilinks =[];

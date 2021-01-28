@@ -1,0 +1,28 @@
+{
+  "name": "arbitrage",
+  "version": "1.0.0",
+  "description": "",
+  "main": "funcDeneme.js",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^5.11.13",
+    "node-fetch": "^2.6.1",
+    "node-html-parser": "^2.0.2",
+    "request": "^2.88.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node funcDeneme.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Abdullah-Koroglu/arbitage.git"
+  },
+  "author": "COREoglu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Abdullah-Koroglu/arbitage/issues"
+  },
+  "homepage": "https://github.com/Abdullah-Koroglu/arbitage#readme"
+}

@@ -27,7 +27,7 @@ getHBProductLinks = (_url) => {
             var pages = pagination.querySelectorAll('li')
             totalSayfa = parseInt(pages[pages.length - 1].rawText.trim())
             console.log(totalSayfa);
-            fs.writeFileSync('kategory.html', '')
+            // fs.writeFileSync('kategory.html', '')
             seachForLink(totalSayfa, _url, () => console.log("alt kategoride ürünlerin linkleri getirildi"))
         } else {
             console.log(response.statusCode + ' getHBProductLinks err');
@@ -35,12 +35,8 @@ getHBProductLinks = (_url) => {
     })
 }
 
-
-
-
-// in the func -----------------------------------------
-
 const seachForLink = (totalSayfa, url, callback) => {
+    fs.writeFileSync('kategory.html', '')
     var links = []
     var sayfalar = []
 
@@ -50,18 +46,19 @@ const seachForLink = (totalSayfa, url, callback) => {
         request(url + sayfa, options, function (error, response) {
             if (error) throw new Error(error);
             if (response.statusCode === 200) {
-                console.log(url + sayfa);
                 sayfalar.push(sayfa)
                 var bodyParsed = HTMLParser.parse(response.body)
                 var items = bodyParsed.querySelectorAll('.search-item')
                 items.forEach(element => {
                     var a = element.querySelector('a')
                     var linkOfA = a.rawAttributes.href
-                    links.push(linkOfA)
+                    // var nameOfA = HTMLParser.parse(naber.querySelectorAll('.product-title')).rawText.trim()
+                    // links.push({link : linkOfA , name : nameOfA})
+                    links.push({link :linkOfA})
                 });
 
                 sayfalar.length === totalSayfa ?
-                    (fs.appendFileSync('kategory.html', links.toString() + '\n'),
+                    (fs.appendFileSync('kategory.html', JSON.stringify(links) + '\n'),
                         console.log(links.length),
                         callback()) : null;
             } else {
@@ -101,6 +98,4 @@ module.exports = {
 // fs.appendFileSync('kategory.html' , links.toString() + '\n')
 // console.log(links);
 // }) 
-// 
-// in the func -----------------------------------------
 // 
