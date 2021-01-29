@@ -40,68 +40,6 @@ var options = {
 
 //  })
 
-
-//-------ürün sorgulama ----------------
-// const res = fs.readFileSync('ProductPrices.html' , "utf-8")
-// let result = res.split('][').join('],[')
-// res1 = JSON.parse('['+ result + ']')
-// res1.map((i)=>{
-//     if (i[0]*5 > i[3] || i[1]*5 > i[3] ) {
-//         console.log(i);
-//     }
-// })
+// const naber = request('http://127.0.0.1/' , options)
 
 
-const express = require('express');
-const mongoose = require('mongoose');
-
-const app = express();
-
-app.use(express.json());
-app.use(express.urlencoded());
-
-app.get('/', (req, res) => {
-    res.send('Bismihi')
-})
-
-
-
-// Connect to MongoDB
-mongoose
-    .connect(
-        'mongodb://mongo:27017/docker-node-mongo',
-        { useNewUrlParser: true }
-    )
-    .then(() => console.log('MongoDB Connected'))
-    .catch(err => console.log(err));
-
-const Product = require('./models/Product');
-
-app.get('/', (req, res) => {
-    Product.find()
-        .then(items => res.render('index', { items }))
-        .catch(err => res.status(404).json({ msg: 'No items found' }));
-});
-
-app.post('/product/add', (req, res) => {
-    const newItem = new Item({
-      name: req.body.name
-    });
-
-    console.log(req.body);
-  
-    newItem.save().then(item => res.redirect('/product'));
-  });
-
-  app.get('/product', async(req, res) => {
-    
-    Product.find().then((item) =>{
-        console.log(item);
-    })
-  });
-
-
-
-const port = 3000;
-
-app.listen(port, () => console.log('Server running...'));
