@@ -33,7 +33,7 @@ const getProductInfos = (_url) => {
                 const end = response.body.indexOf('","quantity')
                 const priceTL = response.body.substring(begin + '"sortPriceText":"'.length, end)
                 Promise.all([getUkProduct(barcode), getUsProduct(barcode), getDeProduct(barcode)]).then(([Uk, Us, De]) => {
-                    resolve({Uk: checkMoney(Uk), Us : checkMoney(Us), De : checkMoney(De), Hb : checkMoney(priceTL), barcode: barcode});
+                    resolve({Uk: checkMoney(Uk), Us : checkMoney(Us), De : checkMoney(De), Hb : checkMoney(priceTL), barcode: barcode , link : _url});
                     // resolve([Uk, Us, De, priceTL, barcode]);
                 }).catch((e) => {
                     console.log(e);

@@ -1,6 +1,7 @@
 const fs = require('fs');
 var request = require('request');
 var HTMLParser = require('node-html-parser');
+const { post } = require('request');
 var sayfa = 1 //for now
 var totalSayfa;
 
@@ -36,7 +37,6 @@ getHBProductLinks = (_url) => {
 }
 
 const seachForLink = (totalSayfa, url, callback) => {
-    fs.writeFileSync('kategory.html', '')
     var links = []
     var sayfalar = []
 
@@ -46,21 +46,22 @@ const seachForLink = (totalSayfa, url, callback) => {
         request(url + sayfa, options, function (error, response) {
             if (error) throw new Error(error);
             if (response.statusCode === 200) {
-                sayfalar.push(sayfa)
+                // sayfalar.push(sayfa)
                 var bodyParsed = HTMLParser.parse(response.body)
                 var items = bodyParsed.querySelectorAll('.search-item')
                 items.forEach(element => {
                     var a = element.querySelector('a')
                     var linkOfA = a.rawAttributes.href
-                    // var nameOfA = HTMLParser.parse(naber.querySelectorAll('.product-title')).rawText.trim()
+                    var nameOfA = HTMLParser.parse(a.querySelectorAll('.product-title')).rawText.trim()
+                    postProductName(nameOfA , linkOfA)
                     // links.push({link : linkOfA , name : nameOfA})
-                    links.push({link :linkOfA})
+                    // links.push({link :linkOfA})
                 });
 
-                sayfalar.length === totalSayfa ?
-                    (fs.appendFileSync('kategory.html', JSON.stringify(links) + '\n'),
-                        console.log(links.length),
-                        callback()) : null;
+                // sayfalar.length === totalSayfa ?
+                //     (console.log(JSON.stringify(links) + '\n'),
+                //         console.log(links.length),
+                //         callback()) : null;
             } else {
                 console.log(response.statusCode + ' seachForLink err');
             }
@@ -68,34 +69,22 @@ const seachForLink = (totalSayfa, url, callback) => {
     }
 }
 
+const postProductName = ((name , link)=>{
+    var options = {
+        'method': 'POST',
+        'url': 'http://localhost/productname',
+        'headers': {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({"name": name,"link": link})
+      
+      };
+      request(options, function (error, response) {
+        if (error) throw new Error(error);
+        console.log(response.body);
+      });
+})
 
 module.exports = {
     getHBProductLinks
 }
-
-
-// var links =[]
-// 
-// var sayfa = 1 //for now
-// 
-// 
-// var _url = `https://www.hepsiburada.com/kampanyalar/barbie?sayfa=${sayfa}`
-// 
-// 
-// 
-// 
-// request(options, function (error, response) {
-// if (error) throw new Error(error);
-// var bodyParsed = HTMLParser.parse(response.body)
-// var items = bodyParsed.querySelectorAll('.search-item')
-// var links =[]
-// items.forEach(element => {
-// var a = element.querySelector('a')
-// var linkOfA = a.rawAttributes.href
-// links.push(linkOfA)
-// });
-// 
-// fs.appendFileSync('kategory.html' , links.toString() + '\n')
-// console.log(links);
-// }) 
-// 

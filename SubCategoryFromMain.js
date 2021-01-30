@@ -1,8 +1,5 @@
 var request = require('request');
 var HTMLParser = require('node-html-parser');
-const fs = require('fs');
-var links = []
-const getHBProductLinks = require('./LinkFinderInCategory.js')
 
 var options = {
     'method': 'GET',
@@ -20,10 +17,8 @@ getCategories = () => {
         if (response.statusCode === 200) {
             console.log(response.statusCode);
             var bodyParsed = HTMLParser.parse(response.body)
-            var linksInSub = [];
             var baslik;
             var groups = bodyParsed.querySelectorAll('.group')
-            fs.writeFileSync('gezer.html', groups.toString())
             groups.forEach(element => {
                 var baslikelementi = element.querySelectorAll('a')
                 try { baslik = baslikelementi[0].innerText }
@@ -31,58 +26,31 @@ getCategories = () => {
                 var a = element.querySelectorAll('a')
                 a.forEach(element => {
                     var linkOfA = element.rawAttributes.href
-                    linksInSub.push(linkOfA)
+                    postCategories(element.innerText, linkOfA, baslik);
+                    // console.log
                 });
-                if (linksInSub.length !== 0)
-                    links.push({ CategoryName: baslik, linksInSub: linksInSub })
-                linksInSub = []
             });
-            // console.log(links);
-            fs.writeFileSync('gezer.html', JSON.stringify({ Links: links, Date: Date.now() }))
-        }else{
-            console.log(response.statusCode + ' kategoriler alınamadı');
         }
-    });
+    })
 }
 
-getCategories()
+const postCategories =(name , link , main)=>{
+    var options = {
+        'method': 'POST',
+        'url': 'http://localhost/category',
+        'headers': {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({"name": name ,"link": link ,"main":main })
+
+      };
+      request(options, function (error, response) {
+        if (error) throw new Error(error);
+        console.log(response.body);
+      });
+
+}
+
 module.exports = {
     getCategories
 }
-
-        // const yalancilinks =[];
-        // yalancilinks.push(links[160])
-        // yalancilinks.push(links[10])
-        // yalancilinks.forEach(element => {
-        // //    getHBProductLinks.getHBProductLinks('https://www.hepsiburada.com' + element + '?sayfa=')
-        // });
-
-
-
-
-
-
-
-
-
-
-
-
-
-// request(options, function (error, response) {
-    // if (error) throw new Error(error);
-    // console.log(response.statusCode);
-    // var bodyParsed = HTMLParser.parse(response.body)
-    // var groups = bodyParsed.querySelectorAll('.group')
-    // fs.writeFileSync('gezer.html' , groups.toString())
-    // groups.forEach(element => {
-        // var a = element.querySelectorAll('a')
-            // a.forEach(element => {
-            //   var linkOfA = element.rawAttributes.href
-            //   links.push(linkOfA)
-            // });
-    // });
-    // 
-    // console.log(links.length);
-    // fs.writeFileSync('gezer.html' , links.toString())
-// });
