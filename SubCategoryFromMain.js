@@ -1,5 +1,6 @@
 var request = require('request');
 var HTMLParser = require('node-html-parser');
+const server = require('./serverFunctions')
 
 var options = {
     'method': 'GET',
@@ -26,7 +27,7 @@ getCategories = () => {
                 var a = element.querySelectorAll('a')
                 a.forEach(element => {
                     var linkOfA = element.rawAttributes.href
-                    postCategories(element.innerText, linkOfA, baslik);
+                    server.postCategories(element.innerText, linkOfA, baslik);
                     // console.log
                 });
             });
@@ -34,22 +35,7 @@ getCategories = () => {
     })
 }
 
-const postCategories =(name , link , main)=>{
-    var options = {
-        'method': 'POST',
-        'url': 'http://localhost/category',
-        'headers': {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({"name": name ,"link": link ,"main":main })
 
-      };
-      request(options, function (error, response) {
-        if (error) throw new Error(error);
-        console.log(response.body);
-      });
-
-}
 
 module.exports = {
     getCategories

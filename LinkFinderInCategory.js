@@ -1,8 +1,7 @@
 const fs = require('fs');
 var request = require('request');
 var HTMLParser = require('node-html-parser');
-const { post } = require('request');
-var sayfa = 1 //for now
+const server = require('./serverFunctions')
 var totalSayfa;
 
 
@@ -18,72 +17,56 @@ var options = {
 };
 
 
-getHBProductLinks = (_url) => {
-    console.log(_url);
-    request(_url, options, function (error, response) {
-        if (error) throw new Error(error);
-        if (response.statusCode === 200) {
-            var bodyParsed = HTMLParser.parse(response.body)
-            var pagination = bodyParsed.querySelector('#pagination')
-            var pages = pagination.querySelectorAll('li')
-            totalSayfa = parseInt(pages[pages.length - 1].rawText.trim())
-            console.log(totalSayfa);
-            // fs.writeFileSync('kategory.html', '')
-            seachForLink(totalSayfa, _url, () => console.log("alt kategoride ürünlerin linkleri getirildi"))
-        } else {
-            console.log(response.statusCode + ' getHBProductLinks err');
-        }
+getHBProductLinks = async (_url, name) => {
+    console.log(name);
+    return new Promise((resolve, reject) => {
+        request(_url, options, function (error, response) {
+            if (error) throw new Error(error);
+            if (response.statusCode === 200) {
+                var bodyParsed = HTMLParser.parse(response.body)
+                var pagination = bodyParsed.querySelector('#pagination')
+                if (pagination !== null) {
+                    var pages = pagination.querySelectorAll('li')
+                    totalSayfa = parseInt(pages[pages.length - 1].rawText.trim())
+                    console.log(totalSayfa);
+                    // fs.writeFileSync('kategory.html', '')
+                    seachForLink(2, _url, () => { console.error("alt kategoride ürünlerin linkleri getirildi"), resolve(1) })
+                }else{
+                    resolve(1)
+                }
+            } else {
+                console.log(response.statusCode + ' getHBProductLinks err');
+            }
+        })
     })
 }
 
-const seachForLink = (totalSayfa, url, callback) => {
-    var links = []
-    var sayfalar = []
-
+const seachForLink = async (totalSayfa, url, callback) => {
+    sayfalar = []
     for (let sayfa = 1; sayfa < totalSayfa + 1; sayfa++) {
-
-
         request(url + sayfa, options, function (error, response) {
             if (error) throw new Error(error);
             if (response.statusCode === 200) {
-                // sayfalar.push(sayfa)
+                sayfalar.push(sayfa)
                 var bodyParsed = HTMLParser.parse(response.body)
                 var items = bodyParsed.querySelectorAll('.search-item')
                 items.forEach(element => {
                     var a = element.querySelector('a')
                     var linkOfA = a.rawAttributes.href
                     var nameOfA = HTMLParser.parse(a.querySelectorAll('.product-title')).rawText.trim()
-                    postProductName(nameOfA , linkOfA)
+                    server.postProductName(nameOfA, linkOfA)
+
                     // links.push({link : linkOfA , name : nameOfA})
                     // links.push({link :linkOfA})
                 });
-
-                // sayfalar.length === totalSayfa ?
-                //     (console.log(JSON.stringify(links) + '\n'),
-                //         console.log(links.length),
-                //         callback()) : null;
+                sayfalar.length === totalSayfa ?
+                    callback() : null;
             } else {
                 console.log(response.statusCode + ' seachForLink err');
             }
         })
     }
 }
-
-const postProductName = ((name , link)=>{
-    var options = {
-        'method': 'POST',
-        'url': 'http://localhost/productname',
-        'headers': {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({"name": name,"link": link})
-      
-      };
-      request(options, function (error, response) {
-        if (error) throw new Error(error);
-        console.log(response.body);
-      });
-})
 
 module.exports = {
     getHBProductLinks
